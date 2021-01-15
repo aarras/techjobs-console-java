@@ -20,6 +20,7 @@ public class JobData {
     private static Boolean isDataLoaded = false;
 
     private static ArrayList<HashMap<String, String>> allJobs;
+    private static ArrayList<HashMap<String,String>> allJobsCopy;
 
     /**
      * Fetch list of all values from loaded data,
@@ -51,7 +52,7 @@ public class JobData {
         // load data, if not already loaded
         loadData();
 
-        return allJobs;
+        return allJobsCopy;
     }
 
     /**
@@ -76,13 +77,35 @@ public class JobData {
 
             String aValue = row.get(column);
 
-            if (aValue.contains(value)) {
+            if (aValue.toUpperCase().contains(value.toUpperCase())) {
                 jobs.add(row);
             }
         }
 
         return jobs;
     }
+
+    /**
+     * Returns results of search value across all fields
+     */
+    public static ArrayList<HashMap<String, String>> findByValue(String searchValue) {
+
+        // load data, if not already loaded
+        loadData();
+
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+
+        for (HashMap<String, String> row : allJobs) {
+            for (String value : row.values()) {
+                if (value.toUpperCase().contains(searchValue.toUpperCase()) && !jobs.contains(row)) {
+                    jobs.add(row);
+                }
+            }
+        }
+
+        return jobs;
+    }
+
 
     /**
      * Read in data from a CSV file and store it in a list
@@ -123,6 +146,6 @@ public class JobData {
             System.out.println("Failed to load job data");
             e.printStackTrace();
         }
+        allJobsCopy = (ArrayList<HashMap<String, String>>)allJobs.clone();
     }
-
 }
